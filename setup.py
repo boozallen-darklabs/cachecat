@@ -19,7 +19,7 @@ setup(
         "cachecat",
         "cachecat.*",
         ]),
-    python_requires = ">=3.6.0",
+    python_requires = ">=3.5.0",
     install_requires = [
         "requests",
         "shortuuid",
@@ -30,9 +30,12 @@ setup(
         # "Development Status :: 5 - Production / Stable",
 
         "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
         ],
     entry_points = {
         "console_scripts" : [
