@@ -10,7 +10,7 @@ def read(fname):
 setup(
     name = "cachecat",
     version = read("VERSION"),
-    # license = "gpl-3.0",
+    license = "MIT",
     description = "Network communication via web cache poisoning",
     long_description = read("README.md"),
     long_description_content_type = "text/markdown",
@@ -19,7 +19,7 @@ setup(
         "cachecat",
         "cachecat.*",
         ]),
-    python_requires = ">=3.5.0",
+    python_requires = ">=3.6.0",
     install_requires = [
         "requests",
         "shortuuid",
@@ -30,7 +30,6 @@ setup(
         # "Development Status :: 5 - Production / Stable",
 
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
