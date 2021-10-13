@@ -5,8 +5,15 @@
 
 ## Requirements
 
-- python >= 3.6
+- python>=3.5
 - python3-pip
+
+## Install
+
+```
+git clone https://github.com/boozallen-darklabs/cachecat
+pip3 install -e ./cachecat
+```
 
 ## Demonstration
 
