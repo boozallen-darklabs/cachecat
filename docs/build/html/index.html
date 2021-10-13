@@ -1,0 +1,350 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Cachecat &#8212; cachecat 0.1.0
+ documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="cachecat">
+<h1>Cachecat<a class="headerlink" href="#cachecat" title="Permalink to this headline">¶</a></h1>
+<p><strong>Cachecat</strong> enables the utilization of a public web cache as shared key-value storage.</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+<li><p><a class="reference internal" href="changelog.html"><span class="doc">Changelog</span></a></p></li>
+</ul>
+<section id="module-cachecat">
+<span id="quickstart"></span><h2>Quickstart<a class="headerlink" href="#module-cachecat" title="Permalink to this headline">¶</a></h2>
+<p>First, install <strong>cachecat</strong> using pip.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Install cachecat</span>
+$ git clone https://github.com/boozallen-darklabs/cachecat
+$ pip3 install -e ./cachecat
+</pre></div>
+</div>
+<p>Once installed, the <code class="code docutils literal notranslate"><span class="pre">cachecat</span></code> bash command should become available.
+<code class="code docutils literal notranslate"><span class="pre">cachecat</span></code> is designed to feel like <code class="code docutils literal notranslate"><span class="pre">netcat</span></code> as a means to
+connect clients together over a network. In this case, you can use
+<code class="code docutils literal notranslate"><span class="pre">cachecat</span></code> to connect clients to a <em>channel</em> on a vulnerable
+web cache and exchange data.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Connect first client to the cache server on channel 100</span>
+$ cachecat -u https://webcachetunneling.com/ -k q -c <span class="m">100</span> -v
+
+<span class="c1"># Connect second client and send data from stdin</span>
+$ cachecat -u https://webcachetunneling.com/ -k q -c <span class="m">100</span>
+Hello,
+world!
+</pre></div>
+</div>
+</section>
+<section id="module-cachecat.cache">
+<span id="cache"></span><h2>Cache<a class="headerlink" href="#module-cachecat.cache" title="Permalink to this headline">¶</a></h2>
+<p>The elementary interface for interacting with a vulnerable web cache is
+implemented as a python dictionary <a class="reference internal" href="#cachecat.cache.Cache" title="cachecat.cache.Cache"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cache</span></code></a>.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="cachecat.cache.Cache">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">cachecat.cache.</span></span><span class="sig-name descname"><span class="pre">Cache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proxy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cachecat.cache.Cache" title="Permalink to this definition">¶</a></dt>
+<dd><p>Some web applications reflect GET request url arguments in cached
+responses, where some arguments are keyed to the cache and others
+are not. This means we can temporarily store data on the
+cache server as a key-value store. This
+<a class="reference internal" href="#cachecat.cache.Cache" title="cachecat.cache.Cache"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cache</span></code></a> class implements that
+technique as the backend for a python dictionary.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Build a python database backed by a vulnerable public web cache</span>
+<span class="n">cache</span> <span class="o">=</span> <span class="n">Cache</span><span class="p">(</span><span class="s2">&quot;https://webcachetunneling.com/&quot;</span><span class="p">,</span> <span class="s2">&quot;q&quot;</span><span class="p">,</span> <span class="s2">&quot;p&quot;</span><span class="p">)</span>
+<span class="n">cache</span><span class="p">[</span><span class="s2">&quot;foo&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;bar&quot;</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">cache</span><span class="p">[</span><span class="s2">&quot;foo&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+<section id="module-cachecat.session">
+<span id="session"></span><h2>Session<a class="headerlink" href="#module-cachecat.session" title="Permalink to this headline">¶</a></h2>
+<p>To coordinate between multiple <a class="reference internal" href="#cachecat.cache.Cache" title="cachecat.cache.Cache"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cache</span></code></a> clients,
+a <a class="reference internal" href="#cachecat.session.Session" title="cachecat.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> iterator implements a stack
+interface based on pseudo-random token strings.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="cachecat.session.Session">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">cachecat.session.</span></span><span class="sig-name descname"><span class="pre">Session</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">port</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">65535</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cachecat.session.Session" title="Permalink to this definition">¶</a></dt>
+<dd><p>Due to the nature of a cache, the mere act of checking the cache
+for data itself writes to the cache, disqualifying that entry for
+subsequent checks. To overcome this, a
+<a class="reference internal" href="#cachecat.session.Session" title="cachecat.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> defines and generates
+a set of predictable tokens which, when queried in a specific order,
+behaves as a type of stack. Through successive queries, each client’s
+<a class="reference internal" href="#cachecat.session.Session" title="cachecat.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> will converge at the
+top of the stack, which will serve as a dynamic reference point for
+new information. For this to work, clients must connect within the
+cache expiration period of each other, which experimentally has been
+about 15 seconds.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Progressively iterate over a Session and report any data in the cache</span>
+<span class="k">for</span> <span class="n">step</span><span class="p">,</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">Session</span><span class="p">(</span><span class="mi">1337</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Step </span><span class="si">%i</span><span class="s2"> contains: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">cache</span><span class="p">[</span><span class="n">token</span><span class="p">]))</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Missing step: </span><span class="si">%i</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">step</span><span class="p">))</span>
+        <span class="k">break</span>
+</pre></div>
+</div>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cachecat.session.Session.port">
+<span class="sig-name descname"><span class="pre">port</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#cachecat.session.Session.port" title="Permalink to this definition">¶</a></dt>
+<dd><p>Choose a shared, but unique, port to start the stack sequence.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cachecat.session.Session.step">
+<span class="sig-name descname"><span class="pre">step</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#cachecat.session.Session.step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Within a session, the step represents the current location on the stack.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="cachecat.session.Session.token">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">token</span></span><a class="headerlink" href="#cachecat.session.Session.token" title="Permalink to this definition">¶</a></dt>
+<dd><p>The token is a string representation of the current stack location,
+and should be used as the cache key</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-cachecat.io">
+<span id="i-o"></span><h2>I/O<a class="headerlink" href="#module-cachecat.io" title="Permalink to this headline">¶</a></h2>
+<p>Wrapping the <a class="reference internal" href="#cachecat.cache.Cache" title="cachecat.cache.Cache"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cache</span></code></a> and
+<a class="reference internal" href="#cachecat.session.Session" title="cachecat.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> interfaces in more familiar
+<a class="reference external" href="https://docs.python.org/3/library/io.html">file-like interfaces</a> simplifies
+the user experience and enables more complex buffering techniques which
+ultimately improve tunneling capacity.</p>
+<p>The following wrappers are currently implemented.</p>
+<section id="reading">
+<h3>Reading<a class="headerlink" href="#reading" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="cachecat.io.CacheReader">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">cachecat.io.</span></span><span class="sig-name descname"><span class="pre">CacheReader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cache</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cachecat.io.CacheReader" title="Permalink to this definition">¶</a></dt>
+<dd><p>A <a class="reference internal" href="#cachecat.io.CacheReader" title="cachecat.io.CacheReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">CacheReader</span></code></a> will
+iterate over a <a class="reference internal" href="#cachecat.session.Session" title="cachecat.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session's</span></code></a>
+token-space and report any new data as an unseekable readable
+file-like interface, implementing <code class="xref py py-class docutils literal notranslate"><span class="pre">io.RawIOBase</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Read all data from a cache session</span>
+<span class="k">with</span> <span class="n">CacheReader</span><span class="p">(</span><span class="n">cache</span><span class="p">,</span> <span class="n">session</span><span class="p">)</span> <span class="k">as</span> <span class="n">reader</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">reader</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>Additionally, a <a class="reference internal" href="#cachecat.io.CacheReader" title="cachecat.io.CacheReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">CacheReader</span></code></a>
+can be wrapped in a <code class="xref py py-class docutils literal notranslate"><span class="pre">BufferedReader</span></code> object
+for more control over the data.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Read the first 100 bytes of data from a cache session</span>
+<span class="k">with</span> <span class="n">io</span><span class="o">.</span><span class="n">BufferedReader</span><span class="p">(</span><span class="n">CacheReader</span><span class="p">(</span><span class="n">cache</span><span class="p">,</span> <span class="n">session</span><span class="p">))</span> <span class="k">as</span> <span class="n">reader</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">reader</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">100</span><span class="p">))</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+<section id="writing">
+<h3>Writing<a class="headerlink" href="#writing" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="cachecat.io.CacheWriter">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">cachecat.io.</span></span><span class="sig-name descname"><span class="pre">CacheWriter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cache</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunk_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1024</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cachecat.io.CacheWriter" title="Permalink to this definition">¶</a></dt>
+<dd><p>A <a class="reference internal" href="#cachecat.io.CacheWriter" title="cachecat.io.CacheWriter"><code class="xref py py-class docutils literal notranslate"><span class="pre">CacheWriter</span></code></a> will
+iterate over a <a class="reference internal" href="#cachecat.session.Session" title="cachecat.session.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session's</span></code></a>
+token-space and write data to the cache at the end of the stack
+as an unseekable writeable file-like interface, implementing
+<code class="xref py py-class docutils literal notranslate"><span class="pre">io.RawIOBase</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Write some data to the cache session</span>
+<span class="k">with</span> <span class="n">CacheWriter</span><span class="p">(</span><span class="n">cache</span><span class="p">,</span> <span class="n">session</span><span class="p">)</span> <span class="k">as</span> <span class="n">writer</span><span class="p">:</span>
+    <span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;Hello, world!&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+<section id="buffered-reading-and-writing">
+<h3>Buffered Reading and Writing<a class="headerlink" href="#buffered-reading-and-writing" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="cachecat.io.CacheIO">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">cachecat.io.</span></span><span class="sig-name descname"><span class="pre">CacheIO</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">writer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">poll_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8192</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cachecat.io.CacheIO" title="Permalink to this definition">¶</a></dt>
+<dd><p>A <a class="reference internal" href="#cachecat.io.CacheIO" title="cachecat.io.CacheIO"><code class="xref py py-class docutils literal notranslate"><span class="pre">CacheIO</span></code></a> object
+will combine a <a class="reference internal" href="#cachecat.io.CacheReader" title="cachecat.io.CacheReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">CacheReader</span></code></a>
+and <a class="reference internal" href="#cachecat.io.CacheWriter" title="cachecat.io.CacheWriter"><code class="xref py py-class docutils literal notranslate"><span class="pre">CacheWriter</span></code></a> into
+a single buffered I/O stream, enabling communication between
+parties across a public web cache. Implemented as a context manager,
+a <a class="reference internal" href="#cachecat.io.CacheIO" title="cachecat.io.CacheIO"><code class="xref py py-class docutils literal notranslate"><span class="pre">CacheIO</span></code></a> object can
+also intermittently poll for new data and pass it to a callback
+function, resembling realtime communication between parties across
+a public web cache.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Build STDOUT callback</span>
+<span class="k">def</span> <span class="nf">callback</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">buffer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">buffer</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+
+<span class="c1"># Connect STDIN/STDOUT to CacheIO</span>
+<span class="k">with</span> <span class="n">CacheIO</span><span class="p">(</span><span class="n">reader</span><span class="p">,</span> <span class="n">writer</span><span class="p">,</span> <span class="n">callback</span><span class="p">)</span> <span class="k">as</span> <span class="n">stream</span><span class="p">:</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">buffer</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="p">:</span>
+            <span class="k">break</span>
+        <span class="n">stream</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+<div class="toctree-wrapper compound">
+</div>
+</section>
+<section id="module-cachecat.__main__">
+<span id="tunneling"></span><h2>Tunneling<a class="headerlink" href="#module-cachecat.__main__" title="Permalink to this headline">¶</a></h2>
+<p>Along with the python interface, <strong>cachecat</strong> supports the bash command
+<code class="code docutils literal notranslate"><span class="pre">cachecat</span></code>, which automatically handles connecting to a web cache
+channel and routing data through it like a tunnel.</p>
+<p>As a simple example, we start by connecting two clients to the same web
+cache channel and exchanging data over stdin/stdout. Note that in order
+for this connection to work, the two clients must connect within about
+15 seconds of each other, or else the cache expires and they cannot
+synchronize.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Connect first client to the cache server on channel 100</span>
+$ cachecat -u https://webcachetunneling.com/ -k q -c <span class="m">100</span>
+
+<span class="c1"># Connect second client and send data from stdin</span>
+$ cachecat -u https://webcachetunneling.com/ -k q -c <span class="m">100</span>
+Hello,
+world!
+</pre></div>
+</div>
+<p>We can also proxy data from a UDP connection, like so.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Connect to the cache server and proxy UDP traffic to it over port 1337</span>
+$ cachecat -u https://webcachetunneling.com/ -k q -c <span class="m">101</span> -lp <span class="m">1337</span>
+
+<span class="c1"># Connect second client to the cache server</span>
+$ cachecat -u https://webcachetunneling.com/ -k q -c <span class="m">101</span>
+
+<span class="c1"># Connect a UDP client to the proxy and send data</span>
+$ nc -u <span class="m">127</span>.0.0.1 <span class="m">1337</span>
+Hello,
+world!
+</pre></div>
+</div>
+<p>We can take this a step further by tunneling a VPN over this proxied UDP
+connection. Keep in mind that the technique and packet loss will severly
+limit throughput over this VPN.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Connect to the cache on the first server and listen for UDP</span>
+<span class="o">(</span><span class="m">1</span><span class="o">)</span> $ cachecat -u https://webcachetunneling.com/ -k q -c <span class="m">102</span> -lp <span class="m">1337</span> -v
+
+<span class="c1"># Connect to the cache on the second server and listen for UDP</span>
+<span class="o">(</span><span class="m">2</span><span class="o">)</span> $ cachecat -u https://webcachetunneling.com/ -k q -c <span class="m">102</span> -lp <span class="m">1337</span> -v
+
+<span class="c1"># Start a VPN on the first server and proxy it through UDP</span>
+<span class="o">(</span><span class="m">1</span><span class="o">)</span> $ socat -v UDP:127.0.0.1:1337 tun:192.168.100.1/24,up
+
+<span class="c1"># Start a VPN on the second server and proxy it through UDP</span>
+<span class="o">(</span><span class="m">2</span><span class="o">)</span> $ socat -v UDP:127.0.0.1:1337 tun:192.168.100.2/24,up
+
+<span class="c1"># The servers should now be routed together, try pinging them</span>
+<span class="o">(</span><span class="m">2</span><span class="o">)</span> $ ping <span class="m">192</span>.168.100.1 -c <span class="m">5</span> -i <span class="m">8</span>
+<span class="m">64</span> bytes from <span class="m">192</span>.168.100.1: <span class="nv">icmp_seq</span><span class="o">=</span><span class="m">1</span> <span class="nv">ttl</span><span class="o">=</span><span class="m">64</span> <span class="nv">time</span><span class="o">=</span><span class="m">3647</span> ms
+<span class="m">64</span> bytes from <span class="m">192</span>.168.100.1: <span class="nv">icmp_seq</span><span class="o">=</span><span class="m">2</span> <span class="nv">ttl</span><span class="o">=</span><span class="m">64</span> <span class="nv">time</span><span class="o">=</span><span class="m">2789</span> ms
+<span class="m">64</span> bytes from <span class="m">192</span>.168.100.1: <span class="nv">icmp_seq</span><span class="o">=</span><span class="m">3</span> <span class="nv">ttl</span><span class="o">=</span><span class="m">64</span> <span class="nv">time</span><span class="o">=</span><span class="m">3451</span> ms
+<span class="m">64</span> bytes from <span class="m">192</span>.168.100.1: <span class="nv">icmp_seq</span><span class="o">=</span><span class="m">4</span> <span class="nv">ttl</span><span class="o">=</span><span class="m">64</span> <span class="nv">time</span><span class="o">=</span><span class="m">2542</span> ms
+<span class="m">64</span> bytes from <span class="m">192</span>.168.100.1: <span class="nv">icmp_seq</span><span class="o">=</span><span class="m">5</span> <span class="nv">ttl</span><span class="o">=</span><span class="m">64</span> <span class="nv">time</span><span class="o">=</span><span class="m">3581</span> ms
+
+--- <span class="m">192</span>.168.100.1 ping statistics ---
+<span class="m">5</span> packets transmitted, <span class="m">5</span> received, <span class="m">0</span>% packet loss, <span class="nb">time</span> 32014ms
+rtt min/avg/max/mdev <span class="o">=</span> <span class="m">2541</span>.664/3201.966/3647.293/449.538 ms
+</pre></div>
+</div>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="#">cachecat</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, johneiser.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.2.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
