@@ -1,7 +1,7 @@
 
 # Cachecat
 
-**Cachecat** is a proof of concept demonstrating [Web Cache Tunneling](https://www.boozallen.com/insights/cyber/tech.html), the utilization of a public web cache as shared key-value storage through cache poisoning. All demonstrations use the deliberately vulnerable page, [https://webcachetunneling.com](https://webcachetunneling.com/).
+**Cachecat** is a proof of concept demonstrating [Web Cache Tunneling](https://www.boozallen.com/insights/cyber/tech/introducing-web-cache-tunneling.html), the utilization of a public web cache as shared key-value storage through cache poisoning. All demonstrations use the deliberately vulnerable page, [https://webcachetunneling.com](https://webcachetunneling.com/).
 
 ## Requirements
 
@@ -22,4 +22,4 @@ pip3 install -e ./cachecat
 - [Bidirectional communication over a public web cache](https://asciinema.org/a/xc3FKMFipWXFnY7JnAdNyie0s)
 - [Tunneling a VPN over a public web cache](https://asciinema.org/a/Gx9TsNMYKqKZsby4VSE8YEy9t)
 
-For more details, please refer to the [publication](https://www.boozallen.com/insights/cyber/tech.html) or [documentation](https://boozallen-darklabs.github.io/cachecat/build/html/).
+For more details, please refer to the [publication](https://www.boozallen.com/insights/cyber/tech/introducing-web-cache-tunneling.html) or [documentation](https://boozallen-darklabs.github.io/cachecat/build/html/).
